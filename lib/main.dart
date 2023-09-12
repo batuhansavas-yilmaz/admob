@@ -2,10 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// ignore_for_file: public_member_api_docs, depend_on_referenced_packages
+// ignore_for_file: public_member_api_docs, depend_on_referenced_packages, use_build_context_synchronously
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'package:webview_flutter/webview_flutter.dart';
 // #docregion platform_imports
@@ -15,7 +17,30 @@ import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 // #enddocregion platform_imports
 
-void main() => runApp(const MaterialApp(home: WebViewExample()));
+void main() {
+  runApp(MaterialApp(
+    home: const WebViewExample(),
+    theme: ThemeData(
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color.fromARGB(255, 0, 135, 245),
+        elevation: 1,
+        systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            systemNavigationBarColor: Color.fromARGB(255, 0, 135, 245)),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          elevation: 1,
+          foregroundColor: Colors.black,
+          fixedSize: const Size(20, 40),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          backgroundColor: const Color.fromARGB(255, 236, 236, 236),
+        ),
+      ),
+    ),
+  ));
+}
 
 class WebViewExample extends StatefulWidget {
   const WebViewExample({super.key});
@@ -109,12 +134,41 @@ Page resource error:
       onWillPop: () async {
         if (await _controller.canGoBack()) {
           await _controller.goBack();
+          showCupertinoDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                Future.delayed(const Duration(seconds: 2), () {
+                  Navigator.of(context).pop(true);
+                });
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 100,
+                      height: 100,
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                        elevation: 1,
+                        color: Colors.black38,
+                        child: const SpinKitFadingCircle(
+                          color: Colors.white,
+                          size: 60.0,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              });
         } else {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text(
-                  'Geride sayfa kalmadı',
+                  'Geride sayfa yok',
                   textAlign: TextAlign.center,
                 ),
                 behavior: SnackBarBehavior.floating,
@@ -128,15 +182,7 @@ Page resource error:
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 0, 135, 245), elevation: 1,
-          systemOverlayStyle: const SystemUiOverlayStyle(
-              statusBarColor: Colors.transparent,
-              systemNavigationBarColor: Color.fromARGB(255, 0, 135, 245)),
-          title: const Text('Admob'),
-          // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
-          actions: <Widget>[
-            NavigationControls(webViewController: _controller),
-          ],
+          title: const Text('Google Admob'),
         ),
         body: WebViewWidget(controller: _controller),
         bottomNavigationBar: Container(
@@ -145,7 +191,7 @@ Page resource error:
               boxShadow: [
                 BoxShadow(offset: Offset(-0.00, -0.10), blurRadius: 0.3)
               ]),
-          height: 0.5,
+          child: NavigationControls(webViewController: _controller),
         ),
       ),
     );
@@ -159,19 +205,85 @@ class NavigationControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return ButtonBar(
+      alignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
-        IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
+        ElevatedButton(
+            child: const Icon(Icons.home),
+            onPressed: () {
+              webViewController
+                  .loadRequest(Uri.parse('https://apps.admob.com/v2/home'));
+              showCupertinoDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext context) {
+                    Future.delayed(const Duration(seconds: 2), () {
+                      Navigator.of(context).pop(true);
+                    });
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 100,
+                          height: 100,
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                            elevation: 1,
+                            color: Colors.black38,
+                            child: const SpinKitFadingCircle(
+                              color: Colors.white,
+                              size: 60.0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  });
+            }),
+        ElevatedButton(
+          child: const Icon(Icons.arrow_back),
           onPressed: () async {
             if (await webViewController.canGoBack()) {
               await webViewController.goBack();
+
+              showCupertinoDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext context) {
+                    Future.delayed(const Duration(seconds: 2), () {
+                      Navigator.of(context).pop(true);
+                    });
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 100,
+                          height: 100,
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                            elevation: 1,
+                            color: Colors.black38,
+                            child: const SpinKitFadingCircle(
+                              color: Colors.white,
+                              size: 60.0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  });
             } else {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text(
-                      'Geride sayfa kalmadı',
+                      'Geride sayfa yok',
                       textAlign: TextAlign.center,
                     ),
                     behavior: SnackBarBehavior.floating,
@@ -182,11 +294,75 @@ class NavigationControls extends StatelessWidget {
             }
           },
         ),
-        IconButton(
-          icon: const Icon(Icons.arrow_forward_ios),
+        ElevatedButton(
+          child: const Icon(Icons.replay_rounded),
+          onPressed: () {
+            webViewController.reload();
+            showCupertinoDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (BuildContext context) {
+                  Future.delayed(const Duration(seconds: 2), () {
+                    Navigator.of(context).pop(true);
+                  });
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 100,
+                        height: 100,
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
+                          elevation: 1,
+                          color: Colors.black38,
+                          child: const SpinKitFadingCircle(
+                            color: Colors.white,
+                            size: 60.0,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                });
+          },
+        ),
+        ElevatedButton(
+          child: const Icon(Icons.arrow_forward),
           onPressed: () async {
             if (await webViewController.canGoForward()) {
               await webViewController.goForward();
+              showCupertinoDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext context) {
+                    Future.delayed(const Duration(seconds: 2), () {
+                      Navigator.of(context).pop(true);
+                    });
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 100,
+                          height: 100,
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                            elevation: 1,
+                            color: Colors.black38,
+                            child: const SpinKitFadingCircle(
+                              color: Colors.white,
+                              size: 60.0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  });
             } else {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -202,10 +378,6 @@ class NavigationControls extends StatelessWidget {
               }
             }
           },
-        ),
-        IconButton(
-          icon: const Icon(Icons.replay),
-          onPressed: () => webViewController.reload(),
         ),
       ],
     );
