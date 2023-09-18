@@ -4,11 +4,13 @@
 
 // ignore_for_file: public_member_api_docs, depend_on_referenced_packages, use_build_context_synchronously
 
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 // #docregion platform_imports
 // Import for Android features.
@@ -18,6 +20,12 @@ import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 // #enddocregion platform_imports
 
 void main() {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   runApp(MaterialApp(
     home: const WebViewExample(),
     theme: ThemeData(
@@ -30,13 +38,13 @@ void main() {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          elevation: 1,
-          foregroundColor: Colors.black,
-          fixedSize: const Size(20, 40),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          backgroundColor: const Color.fromARGB(255, 236, 236, 236),
-        ),
+            elevation: 0,
+            foregroundColor: Colors.white,
+            shape: CircleBorder(eccentricity: 0),
+            backgroundColor: Colors.transparent,
+            side: BorderSide(
+              color: Colors.black38,
+            )),
       ),
     ),
   ));
@@ -51,11 +59,15 @@ class WebViewExample extends StatefulWidget {
 
 class _WebViewExampleState extends State<WebViewExample> {
   late final WebViewController _controller;
+  void initialization() async {
+    await Future.delayed(const Duration(milliseconds: 400));
+    FlutterNativeSplash.remove();
+  }
 
   @override
   void initState() {
     super.initState();
-
+    initialization();
     // #docregion platform_features
     late final PlatformWebViewControllerCreationParams params;
     if (WebViewPlatform.instance is WebKitWebViewPlatform) {
@@ -205,8 +217,8 @@ class NavigationControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ButtonBar(
-      alignment: MainAxisAlignment.spaceEvenly,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         ElevatedButton(
             child: const Icon(Icons.home),
@@ -377,6 +389,12 @@ class NavigationControls extends StatelessWidget {
                 );
               }
             }
+          },
+        ),
+        ElevatedButton(
+          child: const Icon(Icons.close),
+          onPressed: () {
+            exit(0);
           },
         ),
       ],
