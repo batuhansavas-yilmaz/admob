@@ -4,11 +4,10 @@
 
 // ignore_for_file: public_member_api_docs, depend_on_referenced_packages, use_build_context_synchronously
 
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -39,10 +38,11 @@ void main() {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
             elevation: 0,
+            fixedSize: const Size(50, 50),
             foregroundColor: Colors.white,
-            shape: CircleBorder(eccentricity: 0),
-            backgroundColor: Colors.transparent,
-            side: BorderSide(
+            shape: const CircleBorder(eccentricity: 0),
+            backgroundColor: const Color.fromARGB(255, 0, 135, 245),
+            side: const BorderSide(
               color: Colors.black38,
             )),
       ),
@@ -193,6 +193,8 @@ Page resource error:
         return false;
       },
       child: Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        floatingActionButton: FloatNav(webViewController: _controller),
         appBar: AppBar(
           title: const Text('Google Admob'),
         ),
@@ -217,46 +219,14 @@ class NavigationControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return ButtonBar(
+      alignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
         ElevatedButton(
-            child: const Icon(Icons.home),
-            onPressed: () {
-              webViewController
-                  .loadRequest(Uri.parse('https://apps.admob.com/v2/home'));
-              showCupertinoDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (BuildContext context) {
-                    Future.delayed(const Duration(seconds: 2), () {
-                      Navigator.of(context).pop(true);
-                    });
-                    return Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 100,
-                          height: 100,
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0),
-                            ),
-                            elevation: 1,
-                            color: Colors.black38,
-                            child: const SpinKitFadingCircle(
-                              color: Colors.white,
-                              size: 60.0,
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  });
-            }),
-        ElevatedButton(
-          child: const Icon(Icons.arrow_back),
+          child: const Icon(
+            Icons.arrow_back,
+            size: 30,
+          ),
           onPressed: () async {
             if (await webViewController.canGoBack()) {
               await webViewController.goBack();
@@ -307,7 +277,10 @@ class NavigationControls extends StatelessWidget {
           },
         ),
         ElevatedButton(
-          child: const Icon(Icons.replay_rounded),
+          child: const Icon(
+            Icons.refresh_outlined,
+            size: 30,
+          ),
           onPressed: () {
             webViewController.reload();
             showCupertinoDialog(
@@ -342,7 +315,10 @@ class NavigationControls extends StatelessWidget {
           },
         ),
         ElevatedButton(
-          child: const Icon(Icons.arrow_forward),
+          child: const Icon(
+            size: 30,
+            Icons.arrow_forward,
+          ),
           onPressed: () async {
             if (await webViewController.canGoForward()) {
               await webViewController.goForward();
@@ -391,13 +367,56 @@ class NavigationControls extends StatelessWidget {
             }
           },
         ),
-        ElevatedButton(
-          child: const Icon(Icons.close),
-          onPressed: () {
-            exit(0);
-          },
-        ),
       ],
     );
+  }
+}
+
+class FloatNav extends StatelessWidget {
+  const FloatNav({super.key, required this.webViewController});
+
+  final WebViewController webViewController;
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton(
+        elevation: 1,
+        child: const Icon(
+          Icons.home,
+          size: 30,
+        ),
+        onPressed: () {
+          webViewController
+              .loadRequest(Uri.parse('https://apps.admob.com/v2/home'));
+          showCupertinoDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                Future.delayed(const Duration(seconds: 2), () {
+                  Navigator.of(context).pop(true);
+                });
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 100,
+                      height: 100,
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                        elevation: 1,
+                        color: Colors.black38,
+                        child: const SpinKitFadingCircle(
+                          color: Colors.white,
+                          size: 60.0,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              });
+        });
   }
 }
